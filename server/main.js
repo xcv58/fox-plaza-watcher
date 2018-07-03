@@ -1,7 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http'
+import { CRONjob } from 'meteor/ostrio:cron-jobs'
 import Prices from '../imports/collections/Prices'
 import '../imports/TabularTable'
+
+const db = Meteor.users.rawDatabase()
+const cron = new CRONjob({ db })
 
 const extractData = (data) => {
   return data.map(x => {
@@ -55,5 +59,5 @@ const execute = () => {
 Meteor.startup(() => {
   // code to run on server at startup
   // execute()
-  Meteor.setInterval(execute, 1000 * 60 * 60)
+  cron.setInterval(execute, 60 * 60 * 1000, 'execute-1-hour');
 });
