@@ -6,6 +6,8 @@ import moment from 'moment';
 new Tabular.Table({
   name: "Prices",
   collection: Prices,
+  responsive: true,
+  autoWidth: false,
   lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
   columns: [
     {data: "unit_code", title: "Unit"},
