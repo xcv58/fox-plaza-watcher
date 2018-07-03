@@ -1,8 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import { Mongo } from 'meteor/mongo';
 import { HTTP } from 'meteor/http'
-
-export const Prices = new Mongo.Collection('prices');
+import Prices from '../imports/collections/Prices'
+import '../imports/TabularTable'
 
 const extractData = (data) => {
   return data.map(x => {
@@ -39,7 +38,11 @@ const logData = (targetDate) => {
     const { data } = result
     const queryAt = new Date()
     const array = extractData(data)
-    array.forEach(x => Prices.insert({ queryAt, targetDate, ...x }))
+    array.forEach(x => {
+      // const { name, rent_range, targetDate, rent } = x
+      // TODO: remove duplication
+      Prices.insert({ queryAt, targetDate, ...x })
+    })
   } catch (e) {
     console.error(e)
   }
