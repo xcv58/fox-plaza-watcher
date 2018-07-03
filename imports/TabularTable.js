@@ -6,6 +6,7 @@ import moment from 'moment';
 new Tabular.Table({
   name: "Prices",
   collection: Prices,
+  lengthMenu: [[25, 50, 100, -1], [25, 50, 100, "All"]],
   columns: [
     {data: "unit_code", title: "Unit"},
     {data: "rent", title: "Price"},
