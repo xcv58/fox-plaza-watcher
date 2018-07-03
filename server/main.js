@@ -35,10 +35,11 @@ const logData = (targetDate) => {
       'GET',
       `https://www.essexapartmenthomes.com/api/get-available/247/${targetDate}`
     )
+    console.log(`Get data for ${targetDate}`)
     const { data } = result
     const queryAt = new Date()
     const array = extractData(data)
-    array.forEach(x => Prices.insert(x))
+    array.forEach(x => Prices.insert({ queryAt, targetDate, ...x }))
   } catch (e) {
     console.error(e)
   }
@@ -50,5 +51,6 @@ const execute = () => {
 
 Meteor.startup(() => {
   // code to run on server at startup
-  Meteor.setInterval(logData, 1000 * 60 * 60)
+  execute()
+  Meteor.setInterval(execute, 1000 * 60 * 60)
 });
