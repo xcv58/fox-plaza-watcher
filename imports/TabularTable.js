@@ -23,8 +23,8 @@ new Tabular.Table({
       }
     },
     {data: "name", title: "Type"},
-    {
-      tmpl: Meteor.isClient && Template.bookCheckOutCell
-    }
+    // {
+    //   tmpl: Meteor.isClient && Template.bookCheckOutCell
+    // }
   ]
 });
