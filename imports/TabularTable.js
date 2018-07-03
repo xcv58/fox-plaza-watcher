@@ -9,6 +9,7 @@ new Tabular.Table({
   columns: [
     {data: "unit_code", title: "Unit"},
     {data: "rent", title: "Price"},
+    {data: "rent_range", title: "Range"},
     {data: "targetDate", title: "Move in Date"},
     {data: "make_ready_date", title: "Ready Date"},
     {
