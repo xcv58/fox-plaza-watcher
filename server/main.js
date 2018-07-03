@@ -54,6 +54,6 @@ const execute = () => {
 
 Meteor.startup(() => {
   // code to run on server at startup
-  execute()
+  // execute()
   Meteor.setInterval(execute, 1000 * 60 * 60)
 });
