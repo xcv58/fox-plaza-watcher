@@ -1,11 +1,16 @@
-import { Meteor } from 'meteor/meteor';
+import { Meteor } from 'meteor/meteor'
 import { HTTP } from 'meteor/http'
 import { CRONjob } from 'meteor/ostrio:cron-jobs'
+import { Mongo } from 'meteor/mongo'
 import Prices from '../imports/collections/Prices'
 import '../imports/TabularTable'
 
-const db = Meteor.users.rawDatabase()
+const db = new Mongo.Collection('cron').rawDatabase()
 const cron = new CRONjob({ db })
+
+const bound = Meteor.bindEnvironment((callback) => {
+  callback()
+})
 
 const extractData = (data) => {
   return data.map(x => {
@@ -52,12 +57,17 @@ const logData = (targetDate) => {
   }
 }
 
-const execute = () => {
-  TARGET_DATES.forEach(targetDate => logData(targetDate))
-}
+const executeTask = (ready) => bound(
+  () => {
+    TARGET_DATES.forEach(targetDate => logData(targetDate))
+    ready()
+  }
+)
+
+const HOUR = 60 * 60 * 1000
 
 Meteor.startup(() => {
   // code to run on server at startup
-  // execute()
-  cron.setInterval(execute, 60 * 60 * 1000, 'execute-1-hour');
+  // executeTask()
+  cron.setInterval(executeTask, HOUR, 'execute-1-hour');
 });
