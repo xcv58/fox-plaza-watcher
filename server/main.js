@@ -1,7 +1,8 @@
 import { Meteor } from 'meteor/meteor'
 import { HTTP } from 'meteor/http'
-import { CRONjob } from 'meteor/ostrio:cron-jobs'
+import CRONjob from 'meteor/ostrio:cron-jobs'
 import { Mongo } from 'meteor/mongo'
+import moment from 'moment';
 import Prices from '../imports/collections/Prices'
 import '../imports/TabularTable'
 
@@ -30,26 +31,56 @@ const extractData = (data) => {
   }).reduce((acc, cur) => acc.concat(cur), [])
 }
 
-const TARGET_DATES = [
-  '08-15-2018',
-  '09-01-2018',
-  '09-15-2018',
-  '09-30-2018',
-]
+const extractUnits = (data) => {
+  if (!data) {
+    return []
+  }
+  const { result } = JSON.parse(data)
+  if (!result) {
+    return []
+  }
+  const { available_units_count, pricing, start_date, end_date } = result
+  const { unit_distribution } = pricing
+  const units = unit_distribution.map(distribution => {
+    return { ...distribution, available_units_count, start_date, end_date }
+  })
+  return units
+}
+
+const getTargetDates = () => {
+  const today = moment()
+  return [
+    today.format('YYYY-MM-DD'),
+    today.add(14, 'days').format('YYYY-MM-DD'),
+    today.add(14, 'days').format('YYYY-MM-DD'),
+    today.add(14, 'days').format('YYYY-MM-DD')
+  ]
+}
+
+const ENDPOINT_PREFIX = 'https://www.essexapartmenthomes.com/EPT_Feature/PropertyManagement/Service/GetPropertyFilters/518105/'
 
 const logData = (targetDate) => {
   try {
     const result = HTTP.call(
       'GET',
-      `https://www.essexapartmenthomes.com/api/get-available/247/${targetDate}`
+      `${ENDPOINT_PREFIX}${targetDate}`
     )
+
+    console.log(
+      `${ENDPOINT_PREFIX}${targetDate}`
+    );
     console.log(`Get data for ${targetDate}`)
     const { data } = result
+    // console.log(data.result.pricing);
+    // console.log(data.);
     const queryAt = new Date()
-    const array = extractData(data)
-    array.forEach(x => {
+    // const array = extractData(data)
+    const units = extractUnits(data)
+    console.log({ units });
+    units.forEach(x => {
       // const { name, rent_range, targetDate, rent } = x
       // TODO: remove duplication
+      console.log(x);
       Prices.insert({ queryAt, targetDate, ...x })
     })
   } catch (e) {
@@ -59,7 +90,7 @@ const logData = (targetDate) => {
 
 const executeTask = (ready) => bound(
   () => {
-    TARGET_DATES.forEach(targetDate => logData(targetDate))
+    getTargetDates().forEach(targetDate => logData(targetDate))
     ready()
   }
 )
@@ -68,6 +99,6 @@ const HOUR = 60 * 60 * 1000
 
 Meteor.startup(() => {
   // code to run on server at startup
-  // executeTask()
+  // executeTask(() => {})
   cron.setInterval(executeTask, 8 * HOUR, 'execute-1-hour');
 });
