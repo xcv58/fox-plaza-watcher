@@ -100,5 +100,5 @@ const HOUR = 60 * 60 * 1000
 Meteor.startup(() => {
   // code to run on server at startup
   // executeTask(() => {})
-  cron.setInterval(executeTask, 8 * HOUR, 'execute-1-hour');
+  cron.setInterval(executeTask, 8 * HOUR, 'execute-every-8-hours');
 });
